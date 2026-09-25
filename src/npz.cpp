@@ -482,8 +482,10 @@ npzfilewriter::npzfilewriter(const char *path, compression_method_t compression,
       m_compression_method(compression), m_endianness(endianness) {}
 
 npzfilewriter::~npzfilewriter() {
-  if (!m_closed) {
+  try {
     close();
+  } catch (...) {
+    // Explicit close() reports errors; destruction is best-effort only.
   }
 }
 
@@ -497,13 +499,22 @@ void npzfilewriter::write_file(const std::string &filename,
 
   ::write_file(m_output, m_entries, filename, m_compression_method,
                std::move(bytes));
+  if (!m_output) {
+    throw std::runtime_error("Failed to write NPZ file");
+  }
 }
 
 void npzfilewriter::close() {
-  if (!m_closed) {
-    ::close(m_output, m_entries);
-    m_closed = true;
-    m_output.close();
+  if (m_closed) {
+    return;
+  }
+
+  // Do not retry finalization if it fails and the destructor runs.
+  m_closed = true;
+  ::close(m_output, m_entries);
+  m_output.close();
+  if (!m_output) {
+    throw std::runtime_error("Failed to finalize NPZ file");
   }
 }
 
