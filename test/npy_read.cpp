@@ -17,6 +17,7 @@ int test_npy_read() {
   test_read_array<std::int32_t>(result, "int32_array");
   test_read<std::uint64_t>(result, "uint64");
   test_read<std::int64_t>(result, "int64");
+  test_read<npy::float16_t>(result, "float16");
   test_read<float>(result, "float32");
   test_read<double>(result, "float64");
   test_read<std::complex<float>>(result, "complex64");

@@ -25,6 +25,7 @@ int test_npy_peek() {
   test_peek(result, "int32_big", npy::data_type_t::INT32, npy::endian_t::BIG);
   test_peek(result, "uint64", npy::data_type_t::UINT64);
   test_peek(result, "int64", npy::data_type_t::INT64);
+  test_peek(result, "float16", npy::data_type_t::FLOAT16);
   test_peek(result, "float32", npy::data_type_t::FLOAT32);
   test_peek(result, "float64", npy::data_type_t::FLOAT64);
 

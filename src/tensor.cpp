@@ -34,6 +34,10 @@ template <> data_type_t tensor<std::uint64_t>::get_dtype() {
   return data_type_t::UINT64;
 };
 
+template <> data_type_t tensor<float16_t>::get_dtype() {
+  return data_type_t::FLOAT16;
+}
+
 template <> data_type_t tensor<float>::get_dtype() {
   return data_type_t::FLOAT32;
 };

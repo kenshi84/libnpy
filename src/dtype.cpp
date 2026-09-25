@@ -9,13 +9,13 @@
 #define GETC(x) static_cast<char>((x).get())
 
 namespace {
-std::array<std::string, 13> BIG_ENDIAN_DTYPES = {
+std::array<std::string, 14> BIG_ENDIAN_DTYPES = {
     "|i1", "|u1", ">i2", ">u2", ">i4",  ">u4", ">i8",
-    ">u8", ">f4", ">f8", ">c8", ">c16", "|b1"};
+    ">u8", ">f2", ">f4", ">f8", ">c8", ">c16", "|b1"};
 
-std::array<std::string, 13> LITTLE_ENDIAN_DTYPES = {
+std::array<std::string, 14> LITTLE_ENDIAN_DTYPES = {
     "|i1", "|u1", "<i2", "<u2", "<i4",  "<u4", "<i8",
-    "<u8", "<f4", "<f8", "<c8", "<c16", "|b1"};
+    "<u8", "<f2", "<f4", "<f8", "<c8", "<c16", "|b1"};
 
 std::map<std::string, std::pair<npy::data_type_t, npy::endian_t>> DTYPE_MAP = {
     {"|u1", {npy::data_type_t::UINT8, npy::endian_t::NATIVE}},
@@ -32,6 +32,8 @@ std::map<std::string, std::pair<npy::data_type_t, npy::endian_t>> DTYPE_MAP = {
     {">u8", {npy::data_type_t::UINT64, npy::endian_t::BIG}},
     {"<i8", {npy::data_type_t::INT64, npy::endian_t::LITTLE}},
     {">i8", {npy::data_type_t::INT64, npy::endian_t::BIG}},
+    {"<f2", {npy::data_type_t::FLOAT16, npy::endian_t::LITTLE}},
+    {">f2", {npy::data_type_t::FLOAT16, npy::endian_t::BIG}},
     {"<f4", {npy::data_type_t::FLOAT32, npy::endian_t::LITTLE}},
     {">f4", {npy::data_type_t::FLOAT32, npy::endian_t::BIG}},
     {"<f8", {npy::data_type_t::FLOAT64, npy::endian_t::LITTLE}},
@@ -239,6 +241,36 @@ void read_values<>(std::basic_istream<char> &input, int_least32_t *data_ptr,
     for (size_t i = 0; i < num_elements; ++i, ptr += 4) {
       ptr[3] = GETC(input);
       ptr[2] = GETC(input);
+      ptr[1] = GETC(input);
+      ptr[0] = GETC(input);
+    }
+  }
+}
+
+template <>
+void write_values<>(std::basic_ostream<char> &output, const float16_t *data_ptr,
+                    size_t num_elements, endian_t endianness) {
+  if (endianness == npy::endian_t::NATIVE || endianness == native_endian()) {
+    output.write(reinterpret_cast<const char *>(data_ptr), num_elements * 2);
+  } else {
+    for (auto curr = data_ptr; curr < data_ptr + num_elements; ++curr) {
+      const char *start = reinterpret_cast<const char *>(curr);
+      output.put(start[1]);
+      output.put(start[0]);
+    }
+  }
+}
+
+template <>
+void read_values<>(std::basic_istream<char> &input, float16_t *data_ptr,
+                   size_t num_elements, const header_info &info) {
+  char *start = reinterpret_cast<char *>(data_ptr);
+  if (info.endianness == npy::endian_t::NATIVE ||
+      info.endianness == native_endian()) {
+    input.read(start, num_elements * 2);
+  } else {
+    char *ptr = start;
+    for (size_t i = 0; i < num_elements; ++i, ptr += 2) {
       ptr[1] = GETC(input);
       ptr[0] = GETC(input);
     }

@@ -58,6 +58,10 @@ int test_npy_write() {
   actual = test::npy_stream<std::int64_t>(npy::endian_t::LITTLE);
   test::assert_equal(expected, actual, result, "npy_write_int64");
 
+  expected = test::read_asset("float16.npy");
+  actual = test::npy_stream<npy::float16_t>(npy::endian_t::LITTLE);
+  test::assert_equal(expected, actual, result, "npy_write_float16");
+
   expected = test::read_asset("float32.npy");
   actual = test::npy_stream<float>(npy::endian_t::LITTLE);
   test::assert_equal(expected, actual, result, "npy_write_float32");

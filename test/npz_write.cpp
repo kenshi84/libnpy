@@ -24,6 +24,7 @@ void _test(int &result, npy::compression_method_t compression_method) {
     npz.write("color", test::test_tensor<std::uint8_t>({5, 5, 3}));
     npz.write("depth.npy", test::test_tensor<float>({5, 5}));
     npz.write("unicode.npy", test::test_tensor<std::wstring>({5, 2, 5}));
+    npz.write("half.npy", test::test_tensor<npy::float16_t>({5, 5}));
   }
 
   std::string actual = test::read_file(TEMP_NPZ);
@@ -43,6 +44,7 @@ void _test_memory(int &result) {
   npz.write("color", test::test_tensor<std::uint8_t>({5, 5, 3}));
   npz.write("depth.npy", test::test_tensor<float>({5, 5}));
   npz.write("unicode.npy", test::test_tensor<std::wstring>({5, 2, 5}));
+  npz.write("half.npy", test::test_tensor<npy::float16_t>({5, 5}));
   npz.close();
   actual = npz.str();
 

@@ -28,6 +28,11 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <climits>
+#include <cstddef>
+#include <limits>
+#include <type_traits>
+#include <half.hpp>
 
 #define NPY_VERSION_MAJOR 2
 #define NPY_VERSION_MINOR 1
@@ -37,7 +42,9 @@
 const int STATIC_HEADER_LENGTH = 10;
 
 namespace npy {
-/// @brief Enumeration which represents a type of endianness
+using float16_t = half_float::half;
+
+  /// @brief Enumeration which represents a type of endianness
 enum class endian_t : char {
   /// Indicates that the native endianness should be used. Native in this case
   /// means that of the hardware the program is currently running on.
@@ -77,6 +84,8 @@ enum class data_type_t : char {
   INT64,
   /// 64-bit unsigned integer (long)
   UINT64,
+  /// 16-bit floating-point value (float16_t)
+  FLOAT16,
   /// 32-bit floating-point value (float)
   FLOAT32,
   /// 64-bit floating-point value (double)

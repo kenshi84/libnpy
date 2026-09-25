@@ -5,11 +5,13 @@ void _test(int &result, const std::string &filename, bool compressed) {
   auto expected_color = test::test_tensor<std::uint8_t>({5, 5, 3});
   auto expected_depth = test::test_tensor<float>({5, 5});
   auto expected_unicode = test::test_tensor<std::wstring>({5, 2, 5});
+  auto expected_half = test::test_tensor<npy::float16_t>({5, 5});
 
   npy::npzfilereader stream(test::asset_path(filename));
   auto actual_color = stream.read<npy::tensor<std::uint8_t>>("color.npy");
   auto actual_depth = stream.read<npy::tensor<float>>("depth");
   auto actual_unicode = stream.read<npy::tensor<std::wstring>>("unicode");
+  auto actual_half = stream.read<npy::tensor<npy::float16_t>>("half.npy");
 
   std::string suffix = compressed ? "_compressed" : "";
   test::assert_equal(expected_color, actual_color, result,
@@ -18,6 +20,8 @@ void _test(int &result, const std::string &filename, bool compressed) {
                      "npz_read_depth" + suffix);
   test::assert_equal(expected_unicode, actual_unicode, result,
                      "npz_read_unicode" + suffix);
+  test::assert_equal(expected_half, actual_half, result,
+                     "npz_read_half" + suffix);
 }
 
 void _test_large(int &result, const std::string &filename, bool compressed) {
@@ -44,11 +48,13 @@ void _test_memory(int &result, const std::string &filename) {
   auto expected_color = test::test_tensor<std::uint8_t>({5, 5, 3});
   auto expected_depth = test::test_tensor<float>({5, 5});
   auto expected_unicode = test::test_tensor<std::wstring>({5, 2, 5});
+  auto expected_half = test::test_tensor<npy::float16_t>({5, 5});
 
   npy::npzstringreader stream(contents);
   auto actual_color = stream.read<std::uint8_t, npy::tensor>("color.npy");
   auto actual_depth = stream.read<float, npy::tensor>("depth");
   auto actual_unicode = stream.read<std::wstring, npy::tensor>("unicode");
+  auto actual_half = stream.read<npy::float16_t, npy::tensor>("half.npy");
 
   test::assert_equal(expected_color, actual_color, result,
                      "npz_read_color_memory");
@@ -56,6 +62,8 @@ void _test_memory(int &result, const std::string &filename) {
                      "npz_read_depth_memory");
   test::assert_equal(expected_unicode, actual_unicode, result,
                      "npz_read_unicode_memory");
+  test::assert_equal(expected_half, actual_half, result,
+                     "npz_read_half_memory");
 }
 } // namespace
 

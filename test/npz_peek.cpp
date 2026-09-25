@@ -6,6 +6,8 @@ void _test(int &result, const std::string &filename, bool compressed) {
                                   npy::endian_t::NATIVE, false, {5, 5, 3});
   npy::header_info expected_depth(npy::data_type_t::FLOAT32,
                                   npy::endian_t::LITTLE, false, {5, 5});
+  npy::header_info expected_half(npy::data_type_t::FLOAT16,
+                                 npy::endian_t::LITTLE, false, {5, 5});
 
   npy::npzfilereader stream(test::asset_path(filename));
   const auto &keys = stream.keys();
@@ -14,7 +16,9 @@ void _test(int &result, const std::string &filename, bool compressed) {
                      "npz_keys_incorrect");
   test::assert_equal(keys[1], std::string("depth.npy"), result,
                      "npz_keys_incorrect");
-  test::assert_equal(keys[2], std::string("unicode.npy"), result,
+  test::assert_equal(keys[2], std::string("half.npy"), result,
+                     "npz_keys_incorrect");
+  test::assert_equal(keys[3], std::string("unicode.npy"), result,
                      "npz_keys_incorrect");
   test::assert_equal(false, stream.contains("not_there.npy"), result,
                      "npz_contains_missing");
@@ -22,15 +26,20 @@ void _test(int &result, const std::string &filename, bool compressed) {
                      "npz_contains_color");
   test::assert_equal(true, stream.contains("depth.npy"), result,
                      "npz_contains_depth");
+  test::assert_equal(true, stream.contains("half.npy"), result,
+                     "npz_contains_half");
 
   npy::header_info actual_color = stream.peek("color.npy");
   npy::header_info actual_depth = stream.peek("depth.npy");
+  npy::header_info actual_half = stream.peek("half.npy");
 
   std::string suffix = compressed ? "_compressed" : "";
   test::assert_equal(expected_color, actual_color, result,
                      "npz_peek_color" + suffix);
   test::assert_equal(expected_depth, actual_depth, result,
                      "npz_peek_depth" + suffix);
+  test::assert_equal(expected_half, actual_half, result,
+                     "npz_peek_half" + suffix);
 }
 } // namespace
 
